@@ -82,7 +82,7 @@ public class Article {
 			_id = vo.optString("_id");
 			_wordcount = Integer.parseInt(vo.optString("word_count"));
 			
-			this.analyzer = new StopAnalyzer(version, new File("C:/Users/user/workspace/Twitter/ND_Stop_Words_Generic.txt"));
+			this.analyzer = new StopAnalyzer(version, new File("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt"));
 			
 			
 			

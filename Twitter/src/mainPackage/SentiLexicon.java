@@ -24,11 +24,11 @@ public class SentiLexicon {
         BufferedReader csvPos2 = null;
         BufferedReader csvNeg2 = null;
         BufferedReader csvNeg3 = null;
-        String positive = "C:/Users/user/workspace/Twitter/opinion-lexicon-English/LoughranMcDonald_Positive.csv";
-        String positive2 = "C:/Users/user/workspace/Twitter/opinion-lexicon-English/positive-words.txt";
-        String negative = "C:/Users/user/workspace/Twitter/opinion-lexicon-English/LoughranMcDonald_Negative.csv";
-        String negative3 = "C:/Users/user/workspace/Twitter/opinion-lexicon-English/LoughranMcDonald_Litigious.csv";
-        String negative2 = "C:/Users/user/workspace/Twitter/opinion-lexicon-English/negative-words.txt";
+        String positive = "C:/Users/user/git/Twitter/Twitter/opinion-lexicon-English/LoughranMcDonald_Positive.csv";
+        String positive2 = "C:/Users/user/git/Twitter/Twitter/opinion-lexicon-English/positive-words.txt";
+        String negative = "C:/Users/user/git/Twitter/Twitter/opinion-lexicon-English/LoughranMcDonald_Negative.csv";
+        String negative3 = "C:/Users/user/git/Twitter/Twitter/opinion-lexicon-English/LoughranMcDonald_Litigious.csv";
+        String negative2 = "C:/Users/user/git/Twitter/Twitter/opinion-lexicon-English/negative-words.txt";
         try {
             csvPos = new BufferedReader(new FileReader(positive));
             csvNeg = new BufferedReader(new FileReader(negative));
