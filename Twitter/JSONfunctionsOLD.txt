@@ -1,0 +1,198 @@
+package mainPackage;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+
+import sun.net.www.http.HttpClient;
+import sun.rmi.runtime.Log;
+
+public class JSONfunctions {
+	
+	private static final String CLIENT_ID = "264443136646-sl3fl3dt9s73ebgdq03fmire376jckhs.apps.googleusercontent.com";
+	private static final String CLIENT_SECRET = "J24csqTOgDiB2NXfs4-B7BU6";
+	private static final String CALLBACK_URI = "urn:ietf:wg:oauth:2.0:oob";
+	
+	private static final Iterable<String> SCOPE = Arrays.asList("http://www.google.com/trends/fetchComponent?q=bank%20of%20america%20debt&cid=TIMESERIES_GRAPH_0&export=3&hl=en");
+	private static final String USER_INFO_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
+	private static final JsonFactory JSON_FACTORY = new JacksonFactory();
+	private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+	
+	private static String _session;
+	private static int responseCode;
+	
+	private static String stateToken;
+	
+	private static GoogleAuthorizationCodeFlow flow = null;
+
+	public static JSONObject getJSONfromURL(String url){
+        InputStream is = null, urlin = null;
+        String result = "";
+        JSONObject jArray = null;
+        URL	uri = null;
+        
+        //generateStateToken();
+        //flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, CLIENT_ID, CLIENT_SECRET, (Collection<String>) SCOPE).build();
+ 
+        // Download JSON data from URL
+        try{
+               /* DefaultHttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost(url);
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+               */ 
+                uri = new URL(url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) uri.openConnection();
+				getSession2(httpURLConnection);
+				httpURLConnection.addRequestProperty("Cookie", _session);
+				httpURLConnection.setRequestMethod("GET");
+				httpURLConnection.setReadTimeout(240 * 1000);// setting the read timeout
+				httpURLConnection.setDoInput(true);
+				//			httpURLConnection.setDoOutput(true);
+				httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; el; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6 (.NET CLR 3.5.30729)");
+				httpURLConnection.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,/*;q=0.8");
+				httpURLConnection.setRequestProperty("Accept-Language","el-gr,el;q=0.7,en-us.;q=0.3");
+				httpURLConnection.setRequestProperty("Accept-Encoding","gzip");
+				//httpURLConnection.setRequestProperty("if-modified-since","Tue, 01 Jul 2014 18:26:22 GMT");
+				httpURLConnection.setRequestProperty("Accept-Charset","ISO-8859-7,utf-8;q=0.7,*;q=0.7");
+				httpURLConnection.setRequestProperty("Keep-Alive","200");
+				httpURLConnection.setRequestProperty("Connection","keep-alive");
+
+				setSession2(httpURLConnection);
+				responseCode = httpURLConnection.getResponseCode();
+				//if (responseCode == HttpURLConnection.HTTP_OK){
+					//urlin = httpURLConnection.getInputStream();
+
+						//	brBuff = new BufferedReader(new InputStreamReader(new GZIPInputStream(urlin))); 
+				//}
+					//getSession2(httpURLConnection);
+							
+							httpURLConnection.setConnectTimeout(20000);
+							httpURLConnection.setReadTimeout(20000);
+							urlin = httpURLConnection.getInputStream();
+							if ("gzip".equals(httpURLConnection.getHeaderField("Content-Encoding")))
+								urlin = new java.util.zip.GZIPInputStream(urlin);
+							else if ("deflate".equals(httpURLConnection.getHeaderField("Content-Encoding")))
+								urlin = new java.util.zip.DeflaterInputStream(urlin);
+							getSession2(httpURLConnection);
+ 
+        }catch(Exception e){
+                //Log.e("log_tag", "Error in http connection "+e.toString());
+        }
+ 
+        // Convert response to string
+        try{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlin,"iso-8859-1"),8);
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                        sb.append(line + "\n");
+                }
+                urlin.close();
+                result=sb.toString();
+        }catch(Exception e){
+               // Log.e("log_tag", "Error converting result "+e.toString());
+        }
+ 
+        try{
+ 
+        	if (!result.startsWith("{\"query\":{"))
+        	{
+        		result = result.replace("// Data table response", "");
+        		result = result.replace("google.visualization.Query.setResponse(", "{");
+        		result = result.replace(");", "}");
+        	}
+            jArray = new JSONObject(result);           
+        }catch(JSONException e){
+               // Log.e("log_tag", "Error parsing data "+e.toString());
+        }
+ 
+        return jArray;
+    }
+
+	public static void setSession2(HttpURLConnection conn) throws IOException
+	{
+		String s = _session;
+		if (s != null)// && _setsession)
+			conn.setRequestProperty("Cookie", s);
+		//		 System.out.println("set Cookie: " + s);
+	}
+
+	public static void getSession2(HttpURLConnection conn) throws IOException {
+
+		Map<String,List<String>> a = conn.getHeaderFields();
+		System.out.println("Header is: " + a);
+
+		List<String> b = a.get("Set-Cookie");
+		for (String c:b){
+			if (c.contains("S=")){
+				_session = c.split(";")[0];
+				//				 System.out.println("get Cookie: " + c);
+			}
+		}
+	}
+	
+	
+	public String getUserInfoJson(final String authCode) throws IOException {
+
+		final GoogleTokenResponse response = flow.newTokenRequest(authCode).setRedirectUri(CALLBACK_URI).execute();
+		final Credential credential = flow.createAndStoreCredential(response, null);
+		final HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(credential);
+		// Make an authenticated request
+		final GenericUrl url = new GenericUrl(USER_INFO_URL);
+		final HttpRequest request = requestFactory.buildGetRequest(url);
+		request.getHeaders().setContentType("application/json");
+		final String jsonIdentity = request.execute().parseAsString();
+
+		return jsonIdentity;
+
+	}
+	
+	public String getStateToken(){
+		return stateToken;
+	}
+	
+	private static void generateStateToken(){
+
+		SecureRandom sr1 = new SecureRandom();
+
+		stateToken = "google;"+sr1.nextInt();
+
+	}
+	
+public String buildLoginUrl() {
+		
+		final GoogleAuthorizationCodeRequestUrl url = flow.newAuthorizationUrl();
+		
+		return url.setRedirectUri(CALLBACK_URI).setState(stateToken).build();
+	}
+
+}
