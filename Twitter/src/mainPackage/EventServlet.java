@@ -17,7 +17,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import twitter4j.TwitterException;
 
 /**
  *
@@ -76,18 +75,16 @@ public class EventServlet extends HttpServlet {
      */
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, UnknownHostException, TwitterException, ParseException, Exception {
+            throws ServletException, IOException, UnknownHostException, ParseException, Exception {
         response.setContentType("text/html;charset=UTF-8");
 
         try (PrintWriter out = response.getWriter()) {
 
-            Date startDate = new SimpleDateFormat("yyyy-MM-dd kk:mm",
-                    Locale.ENGLISH).parse(request.getParameter("startDate")
-                            + " " + request.getParameter("startTime"));
+            Date startDate = new SimpleDateFormat("yyyy-MM-dd",
+                    Locale.ENGLISH).parse(request.getParameter("startDate"));
 
-            Date endDate = new SimpleDateFormat("yyyy-MM-dd kk:mm",
-                    Locale.ENGLISH).parse(request.getParameter("endDate")
-                            + " " + request.getParameter("endTime"));
+            Date endDate = new SimpleDateFormat("yyyy-MM-dd",
+                    Locale.ENGLISH).parse(request.getParameter("endDate"));
                 //έλεγχος περίπτωσης οπου ο χρήστης έχει δωσει λάθος χρονικο διάστημα
             //redirect σε αντίστοιχη σελίδα λάθους
             if (startDate.getTime() - endDate.getTime() >= 0) {
@@ -123,7 +120,6 @@ public class EventServlet extends HttpServlet {
                  αντίστοιχες παραμέτρους τις οποίες παίρνουμε απο το request.
                  */
                 String[] array = help.sentiStream(startDate, endDate,
-                        Integer.parseInt(request.getParameter("Duration")),
                         classifier);
                 //ανάθεση του πίνακα των αποτελεσμάτων στην μεταβλητή array
                 request.setAttribute("array", array);
@@ -147,8 +143,6 @@ public class EventServlet extends HttpServlet {
             throws ServletException, IOException, UnknownHostException {
         try {
             processRequest(request, response);
-        } catch (TwitterException ex) {
-            Logger.getLogger(EventServlet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
             Logger.getLogger(EventServlet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
@@ -169,9 +163,7 @@ public class EventServlet extends HttpServlet {
             throws ServletException, IOException, UnknownHostException {
         try {
             processRequest(request, response);
-        } catch (TwitterException ex) {
-            Logger.getLogger(EventServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
+        }catch (ParseException ex) {
             Logger.getLogger(EventServlet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(EventServlet.class.getName()).log(Level.SEVERE, null, ex);

@@ -54,8 +54,8 @@ public class HelperUtil
 		//DBObject dbo = null;
 		//dbo = cursorDoc.next();
 		try {
-			dd = formatter2.parse(start.toString().substring(0, 10));
-			dd2 = formatter2.parse(end.toString().substring(0, 10));
+			dd = formatter2.parse(start.toString());
+			dd2 = formatter2.parse(end.toString());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -76,13 +76,13 @@ public class HelperUtil
 	 * chart api και στο google maps api
 	 *
 	 */
-	public String[] sentiStream(Date start, Date end, Integer Duration,
+	public String[] sentiStream(Date start, Date end,
 			LMClassifier classifier) throws UnknownHostException, Exception
 	{
 		HashMap<String, Integer> countries = new HashMap<String, Integer>();
 		String country = "[";
 		String[] result = new String[3];
-		long BuckSize = ONE_MINUTE_IN_MILLIS * Duration;
+		//long BuckSize = ONE_MINUTE_IN_MILLIS * Duration;
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
 		DBObject obj;
@@ -90,7 +90,7 @@ public class HelperUtil
 		Article status;
 		int sumNeg, sumPos, sumNeu, sumNegAll, sumPosAll, sumNeuAll;
 		String stringTimeline = "[['Time', 'Positive', 'Negative','Neutral'],";
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-YYYY");
 		sumNegAll = 0;
 		sumPosAll = 0;
 		sumNeuAll = 0;
