@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.bson.types.ObjectId;
 
@@ -48,11 +49,18 @@ public class HelperUtil
 	{
 
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-		SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
-		String d, d2;
+		SimpleDateFormat formatter2 = new SimpleDateFormat("EEE MMM dd hh:mm:ss z yyyy", Locale.ENGLISH);
+		String d, d2, s1, s2;
 		Date dd = null, dd2 = null;
 		//DBObject dbo = null;
 		//dbo = cursorDoc.next();
+		
+		//String year1 = start.toString().substring(start.toString().length()-5);
+		//String year2 = end.toString().substring(end.toString().length()-5);
+		//String date1 = start.toString().substring(4, 10);
+		//String date2 = end.toString().substring(4, 10);
+		//s1 = date1 + "," + year1;
+		//s2 = date2 + "," + year2;
 		try {
 			dd = formatter2.parse(start.toString());
 			dd2 = formatter2.parse(end.toString());
@@ -64,9 +72,9 @@ public class HelperUtil
 		d2 = formatter.format(dd2);
 		//ObjectId startId = new ObjectId(start);
 		//ObjectId endId = new ObjectId(end);
-		BasicDBObject dateQuery = null;// = new BasicDBObject("pub_date",
+		BasicDBObject dateQuery = new BasicDBObject("pub_date", new BasicDBObject("$gt", d).append("$lt", d2));//"pub_date",
 				//new BasicDBObject("$gte", startId).append("$lt", endId));
-		dateQuery.put("pub_date", new BasicDBObject("$gt", Integer.parseInt(d)).append("$lt", Integer.parseInt(d2)));
+		//dateQuery.put("pub_date", new BasicDBObject("$gt", Integer.parseInt(d)).append("$lt", Integer.parseInt(d2)));
 		return coll.find(dateQuery);
 	}
 
