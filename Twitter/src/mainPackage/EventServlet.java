@@ -50,7 +50,7 @@ public class EventServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-    	pre = new PreProcessing();
+    	//pre = new PreProcessing();
         help = new HelperUtil();
         try {
             //παράδειγμα χρήσης της κλάσης preProcessing εδω μονο διαβάζουμε 
@@ -59,11 +59,11 @@ public class EventServlet extends HttpServlet {
             //idf = preprocessor.getIdf();
             //postingMap = preprocessor.getPostings();
             //classifier = preprocessor.getClassifier();
-            idf = (HashMap<String, Double>) SerializationUtil.deserialize(getServletContext().getRealPath("/idf.dat"));
+            idf = (HashMap<String, Double>) SerializationUtil.deserialize("C:/Users/user/git/Twitter/Twitter/idf.dat");
             System.out.println("Loaded idf");
-            postingMap = (HashMap<Long, HashMap<String, Integer>>) SerializationUtil.deserialize(getServletContext().getRealPath("/postings.dat"));
+            postingMap = (HashMap<Long, HashMap<String, Integer>>) SerializationUtil.deserialize("C:/Users/user/git/Twitter/Twitter/postings.dat");
             System.out.println("Loaded postings");
-            classifier = (LMClassifier) SerializationUtil.deserialize(getServletContext().getRealPath("/classifier.dat"));
+            classifier = (LMClassifier) SerializationUtil.deserialize("C:/Users/user/git/Twitter/Twitter/classifier.dat");
             System.out.println("Loaded class");
         } catch (Exception e) {
             System.out.println("Mpeos " + e.getLocalizedMessage());
