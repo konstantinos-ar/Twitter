@@ -140,6 +140,11 @@ public class Article {
 		return _abstract;
 	}
 	
+	public String getText()
+	{
+		return _abstract != null ? _abstract : _lead_paragraph;
+	}
+	
 	public String getSource()
 	{
 		return _source;
