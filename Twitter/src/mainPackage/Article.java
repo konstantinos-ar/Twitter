@@ -290,38 +290,41 @@ public class Article {
     	String s = null;
     	sr = new StringReader(text);
         
-    	for (int i = 0; i < _stopList.size(); i++)
+    	try
     	{
-    		try
-    		{
-				this.analyzer = new StopAnalyzer(version, new File(_stopList.get(i)));
-				ts = analyzer.tokenStream("irrelevant", sr);
-				
-				//offsetAtt = ts.addAttribute(OffsetAttribute.class);
-		        termAtt = ts.addAttribute(CharTermAttribute.class);
 
-		        ts.reset();
-		        
-		        while (ts.incrementToken())
-		        {
-		            //int startOffset = offsetAtt.startOffset();
-		            //int endOffset = offsetAtt.endOffset();
-
-		            String term = termAtt.toString();
-		            stemmer.setCurrent(term);
-		            stemmer.stem();
-		            term = stemmer.getCurrent();
-		            
-		            s = s + term + " ";
-		        }
-		        ts.close();
-		        
-			}
-    		catch (IOException e)
+    		for (int i = 0; i < _stopList.size(); i++)
     		{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    			this.analyzer = new StopAnalyzer(version, new File(_stopList.get(i)));
+    			ts = analyzer.tokenStream("irrelevant", sr);
+
+    			//offsetAtt = ts.addAttribute(OffsetAttribute.class);
+    			termAtt = ts.addAttribute(CharTermAttribute.class);
+
+    			ts.reset();
+
+    			while (ts.incrementToken())
+    			{
+    				//int startOffset = offsetAtt.startOffset();
+    				//int endOffset = offsetAtt.endOffset();
+
+    				String term = termAtt.toString();
+    				stemmer.setCurrent(term);
+    				stemmer.stem();
+    				term = stemmer.getCurrent();
+
+    				s = s + term + " ";
+    			}
+
+    			
+    		}
+    		ts.close();
+
+    	}
+    	catch (IOException e)
+    	{
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
     	}
     	sr.close();
     	return s;
