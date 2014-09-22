@@ -40,9 +40,9 @@ public class Nparser
 
 	public static void main(String[] args)
 	{
-		stream();
+		//stream();
 		//getLast();
-		//PreProcessing p = new PreProcessing();
+		PreProcessing p = new PreProcessing();
 	}
 
 	private static void stream()

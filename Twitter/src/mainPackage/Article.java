@@ -3,10 +3,13 @@ package mainPackage;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -127,22 +130,22 @@ public class Article {
 	
 	public String getSnippet()
 	{
-		return _snippet;
+		return _snippet.toLowerCase();
 	}
 	
 	public String getLeadparagraph()
 	{
-		return _lead_paragraph;
+		return _lead_paragraph.toLowerCase();
 	}
 	
 	public String getAbstract()
 	{
-		return _abstract;
+		return _abstract.toLowerCase();
 	}
 	
 	public String getText()
 	{
-		return _abstract != null ? _abstract : _lead_paragraph;
+		return !_abstract.equals("") ? _abstract.toLowerCase() : _lead_paragraph.toLowerCase();
 	}
 	
 	public String getSource()
@@ -167,7 +170,19 @@ public class Article {
 	
 	public String getDate()
 	{
-		return _pubdate;
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
+		Date dd = null;
+		try {
+				dd = formatter2.parse(_pubdate.substring(10, 34));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String d = formatter.format(dd);
+				//d2 = formatter.format(dd2);
+		
+		return d;
 	}
 
 	public String getDoctype()

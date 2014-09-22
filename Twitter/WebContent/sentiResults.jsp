@@ -61,6 +61,35 @@
                 chart.draw(data, options);
             }
         </script>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages: ["corechart"]});
+            google.setOnLoadCallback(drawChart);
+            function drawChart() {
+            	var data = new google.visualization.DataTable();
+            	data.addColumn('string', 'Date'); 
+            	data.addColumn('number', 'Articles'); 
+            	data.addColumn({type:'boolean', role:'emphasis'}); 
+            	data.addColumn({type:'string', role:'annotation'});
+            	
+            	data.addRows(
+            		      
+            		      <%//προσπέλαση του πίνακα των αποτελεσμάτων από μεταβλητή array
+            		        String[] output2=(String[])request.getAttribute("array");
+            		        out.println(output2[0]);
+            		      %>
+            		        );
+
+                var options = {
+                    title: 'Positive-Negative-Neutral tweets',
+                    backgroundColor: 'transparent',
+                    curveType: 'function',
+                    legend: { position: 'bottom' }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('index_div'));
+                chart.draw(data, options);
+            }
+        </script>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
         <script>
 
@@ -116,11 +145,13 @@
 
 
             <p></p>
-            <div class="row "><div class="col-md-8 col-md-offset-2"><h3><span class="label label-primary">Map with Coordinated Tweets</span></h3></div></div>
-            <p/><div class="row "><div class="col-md-8 col-md-offset-2"><div id="map_canvas" style="width: auto; height: 500px;"></div></div>  </div>
+          <!--  <div class="row "><div class="col-md-8 col-md-offset-2"><h3><span class="label label-primary">Map with Coordinated Tweets</span></h3></div></div>
+            <p/><div class="row "><div class="col-md-8 col-md-offset-2"><div id="map_canvas" style="width: auto; height: 500px;"></div></div>  </div>-->
             <div class="row "><div class="col-md-8 col-md-offset-2"><h3><span class="label label-primary">Chronological Line-Chart of Sentiment Analysis</span></h3></div></div>
             <p/><div class="row "><div class="col-md-8 col-md-offset-2"><div id="chart_div" style="width: 900px; height: 500px;"></div></div></div>
-            <div class="row "><div class="col-md-8 col-md-offset-2"><h3><span class="label label-primary">Summery of Sentiment Analysis at a PieChart</span></h3></div></div>
+            <div class="row "><div class="col-md-8 col-md-offset-2"><h3><span class="label label-primary">Chronological Index-Chart</span></h3></div></div>
+            <p/><div class="row "><div class="col-md-8 col-md-offset-2"><div id="index_div" style="width: 900px; height: 500px;"></div></div></div>
+            <div class="row "><div class="col-md-8 col-md-offset-2"><h3><span class="label label-primary">Summary of Sentiment Analysis at a PieChart</span></h3></div></div>
             <div class="row "><div class="col-md-8 col-md-offset-2"><div id="piechart" style="width: 900px; height: 500px;"></div></div></div>
             
 

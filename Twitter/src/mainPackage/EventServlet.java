@@ -103,7 +103,7 @@ public class EventServlet extends HttpServlet {
                  Κληση μεθοδου ευρεσης των event με τις αντίστοιχες παραμέτρους
                  τις οποίες παίρνουμε απο το request.
                  */
-                String[] array = help.stringOfPeaks(startDate, endDate,
+               /* String[] array = help.stringOfPeaks(startDate, endDate,
                         Integer.parseInt(request.getParameter("topKWords")),
                         Integer.parseInt(request.getParameter("topKUrls")),
                         Integer.parseInt(request.getParameter("topKTweets")),
@@ -112,7 +112,7 @@ public class EventServlet extends HttpServlet {
                 request.setAttribute("array", array);
                 //Αποστολή αποτελεσματων και εμφάνισή τους.
                 request.getRequestDispatcher("/eventResults.jsp").forward(request, response);
-                array = null;
+                array = null;*/
             } else {
                 //2ος τροπος
                   /*

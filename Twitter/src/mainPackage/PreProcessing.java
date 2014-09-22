@@ -101,7 +101,7 @@ public class PreProcessing
 		Article currDoc;
 		DBCursor cursor = collection1.find();
 		int counter = 0;
-		int sentiScore;
+		double sentiScore;
 		SentiLexicon lexicon = new SentiLexicon();
 		try
 		{
@@ -123,7 +123,7 @@ public class PreProcessing
                  το κατατάσσουμε αναλογως στο συνολο παραδειγμάτων εκπαίδευσης του
                  classifier.
 				 */
-				sentiScore = lexicon.getScore(currDoc.getAbstract());
+				sentiScore = lexicon.extractScore(currDoc.getText());
 				if (sentiScore > 0)
 				{
 					if (posList.size() < 10000)
@@ -168,9 +168,9 @@ public class PreProcessing
 	{
 		String[] categories = new String[3];
 		LMClassifier classi;
-		categories[0] = "positive";
-		categories[1] = "negative";
-		categories[2] = "neutral";
+		categories[0] = "pos";
+		categories[1] = "neg";
+		categories[2] = "neu";
 		ArrayList<Iterator> itList = new ArrayList(3);
 		itList.add(pos.iterator());
 		itList.add(neg.iterator());
@@ -190,10 +190,10 @@ public class PreProcessing
 			while (itCurr.hasNext())
 			{
 				temp = itCurr.next();
-				if (temp.getAbstract() != null)
-					text = temp.getAbstract();
-				else
-					text = temp.getSnippet();
+				//if (temp.getAbstract() != null)
+					text = temp.getText();
+				//else
+				//	text = temp.getSnippet();
 				Classified classified = new Classified(text, classification);
 				((ObjectHandler) classi).handle(classified);
 			}

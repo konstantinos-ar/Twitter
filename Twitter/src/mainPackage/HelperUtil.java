@@ -17,12 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.bson.types.ObjectId;
-
-import twitter4j.Status;
-import twitter4j.TwitterException;
-import twitter4j.TwitterObjectFactory;
-
 /**
  * Βοηθητική κλάση με λειτουργίες που θεωρήσαμε οτι δεν χρειαζοτανε να
  * δημιουργήσουμε ξεχωριστές κλάσεις για τη κάθε μια, οποτε και τις
@@ -43,15 +37,16 @@ public class HelperUtil
 	 * αποθηκευτηκε ένα στοιχείο. Ετσι θεωρησαμε οτι αφου τα αποτελέσματα μας
 	 * είναι realtime είναι σωστο να πάρουμε αυτο. Στη πραγματικοτητα
 	 * παρατηρήσαμε οτι δεν υπάρχει καθολου διαφορα.
+	 * @throws ParseException 
 	 */
 
-	public DBCursor getCursorInRange(DBCollection coll, Date start, Date end)
+	public DBCursor getCursorInRange(DBCollection coll, String start, String end) throws ParseException
 	{
 
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-		SimpleDateFormat formatter2 = new SimpleDateFormat("EEE MMM dd hh:mm:ss z yyyy", Locale.ENGLISH);
-		String d, d2, s1, s2;
-		Date dd = null, dd2 = null;
+		//SimpleDateFormat formatter2 = new SimpleDateFormat("EEE MMM dd hh:mm:ss z yyyy", Locale.ENGLISH);
+		//String d, d2, s1, s2;
+		//Date dd = null, dd2 = null;
 		//DBObject dbo = null;
 		//dbo = cursorDoc.next();
 		
@@ -61,18 +56,18 @@ public class HelperUtil
 		//String date2 = end.toString().substring(4, 10);
 		//s1 = date1 + "," + year1;
 		//s2 = date2 + "," + year2;
-		try {
-			dd = formatter2.parse(start.toString());
-			dd2 = formatter2.parse(end.toString());
-		} catch (ParseException e) {
+		//try {
+		//	dd = formatter2.parse(start.toString());
+		//	dd2 = formatter2.parse(end.toString());
+		//} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		d = formatter.format(dd);
-		d2 = formatter.format(dd2);
+		//	e.printStackTrace();
+		//}
+		//d = formatter.format(dd);
+		//d2 = formatter.format(dd2);
 		//ObjectId startId = new ObjectId(start);
 		//ObjectId endId = new ObjectId(end);
-		BasicDBObject dateQuery = new BasicDBObject("pub_date", new BasicDBObject("$gt", d).append("$lt", d2));//"pub_date",
+		BasicDBObject dateQuery = new BasicDBObject("pub_date", new BasicDBObject("$gte", formatter.parseObject(start)).append("$lte", formatter.parseObject(end)));//"pub_date",
 				//new BasicDBObject("$gte", startId).append("$lt", endId));
 		//dateQuery.put("pub_date", new BasicDBObject("$gt", Integer.parseInt(d)).append("$lt", Integer.parseInt(d2)));
 		return coll.find(dateQuery);
@@ -88,6 +83,20 @@ public class HelperUtil
 			LMClassifier classifier) throws UnknownHostException, Exception
 	{
 		HashMap<String, Integer> countries = new HashMap<String, Integer>();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat formatter2 = new SimpleDateFormat("EEE MMM dd hh:mm:ss z yyyy", Locale.ENGLISH);
+		SimpleDateFormat form = new SimpleDateFormat("MMM dd yyyy");
+		String d, d2, s1, s2;
+		Date dd = null, dd2 = null;
+		try {
+			dd = formatter2.parse(start.toString());
+			dd2 = formatter2.parse(end.toString());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		d = formatter.format(dd);
+		d2 = formatter.format(dd2);
 		String country = "[";
 		String[] result = new String[3];
 		//long BuckSize = ONE_MINUTE_IN_MILLIS * Duration;
@@ -97,17 +106,20 @@ public class HelperUtil
 		final DBCollection collection = db.getCollection("news");
 		Article status;
 		int sumNeg, sumPos, sumNeu, sumNegAll, sumPosAll, sumNeuAll;
-		String stringTimeline = "[['Time', 'Positive', 'Negative','Neutral'],";
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-YYYY");
+		String stringTimeline = "[['Date', 'Sentiment'],";
+		//SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-YYYY");
 		sumNegAll = 0;
 		sumPosAll = 0;
 		sumNeuAll = 0;
+		Date dn, dx;
 		//for (long time = start.getTime(); time <= end.getTime(); time += BuckSize)
 		//{
 			sumNeg = 0;
 			sumPos = 0;
 			sumNeu = 0;
-			DBCursor temp = getCursorInRange(collection, start, end);
+			String pubdate = d;
+			DBCursor temp = getCursorInRange(collection, d, d2);
+			double fscore = 0;
 
 
 			while (temp.hasNext())
@@ -115,6 +127,15 @@ public class HelperUtil
 				obj = temp.next();
 
 				status = new Article(obj);
+				if (!status.getDate().equals(pubdate))
+				{
+					stringTimeline = stringTimeline + "['" + form.format(formatter.parse(pubdate)) + "',"
+							+ (sumPos - sumNeg) + "],";
+					sumNeg = 0;
+					sumPos = 0;
+					sumNeu = 0;
+				}
+				pubdate = status.getDate();
 				Integer score;
 				String sentiTest = classifier.classify(status.getText()).bestCategory();
 				//δημιουργουμε το χάρτη με τα θετικά,αρνητικά και ουδέτερα tweets
@@ -132,21 +153,24 @@ public class HelperUtil
 					//}
 					sumPos++;
 				}
-				else
+				else if ("neg".equals(sentiTest))
 				{
 					//if (status.getGeoLocation() != null) {
 					//    country = country + "['Negative'," + status.getGeoLocation().getLatitude() + "," + status.getGeoLocation().getLongitude() + ",'red'],";
 					//}
 					sumNeg++;
 				}
+				sumNegAll += sumNeg;
+				sumPosAll += sumPos;
+				sumNeuAll += sumNeu;
 
 			}
-			sumNegAll += sumNeg;
-			sumPosAll += sumPos;
-			sumNeuAll += sumNeu;
+			//sumNegAll += sumNeg;
+			//sumPosAll += sumPos;
+			//sumNeuAll += sumNeu;
 			//δημιουργουμε το ιστογραμμα του συναισθήματος των tweets
-			stringTimeline = stringTimeline + "['" + formatter.format(end) + "',"
-					+ sumPos + "," + sumNeg + "," + sumNeu + "],";
+			//stringTimeline = stringTimeline + "['" + formatter.format(end) + "',"
+			//		+ sumPos + "," + sumNeg + "," + sumNeu + "],";
 
 		//}
 		stringTimeline = stringTimeline + "]";
@@ -154,7 +178,7 @@ public class HelperUtil
 		String stingMap = "[['Country', 'Sentiment'],";
 
 		result[2] = country + "]";
-		result[1] = "[['Sentiment','number of Tweets'],"//δημιουργουμε τη πίτα του συναισθήματος των tweets
+		result[1] = "[['Sentiment','number of Articles'],"//δημιουργουμε τη πίτα του συναισθήματος των tweets
 				+ "['Positive'," + sumPosAll + "],"
 				+ "['Negative'," + sumNegAll + "],"
 				+ "['Neutral'," + sumNeuAll + "]]";
@@ -168,7 +192,7 @@ public class HelperUtil
 	 * περιοχων ενδιαφέροντος
 	 *
 	 */
-	public String[] stringOfPeaks(Date start, Date end, Integer topWords, Integer topURLs, Integer topRetweets, Integer Duration, HashMap<String, Double> idf,
+	/*public String[] stringOfPeaks(Date start, Date end, Integer topWords, Integer topURLs, Integer topRetweets, Integer Duration, HashMap<String, Double> idf,
 			HashMap<Long, HashMap<String, Integer>> postingMap) throws UnknownHostException, IOException, TwitterException
 			{
 
@@ -265,5 +289,5 @@ public class HelperUtil
 		fin[0] = sum;
 		fin[1] = resultString;
 		return fin;
-	}
+	}*/
 }
