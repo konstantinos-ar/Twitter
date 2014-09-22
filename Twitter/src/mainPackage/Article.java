@@ -23,6 +23,7 @@ import org.bson.BasicBSONDecoder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.tartarus.snowball.ext.PorterStemmer;
 
 import com.mongodb.DBObject;
 
@@ -44,6 +45,8 @@ public class Article {
 	private String _typeof;
 	private String _id;
 	private int _wordcount;
+	private String _stemmed;
+	private ArrayList<String> _stopList = new ArrayList<String>();
 	
 	private final Version version = Version.LUCENE_48;
 	private Analyzer analyzer;
@@ -51,7 +54,8 @@ public class Article {
     private TokenStream ts;
     private OffsetAttribute offsetAtt;
     private CharTermAttribute termAtt;
-    private final HashMap<String, Integer> tokens;
+    //private final HashMap<String, Integer> tokens;
+    private final PorterStemmer stemmer = new PorterStemmer();
     private int totalTokens = 0;
     private long id;
 	
@@ -85,9 +89,15 @@ public class Article {
 			_id = vo.optString("_id");
 			_wordcount = Integer.parseInt(vo.optString("word_count"));
 			
-			this.analyzer = new StopAnalyzer(version, new File("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt"));
+			//this.analyzer = new StopAnalyzer(version, new File("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt"));
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Currencies.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_DatesandNumbers.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Geographic.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Names.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/stop.txt");
 			
-			
+			_stemmed = calcStemmed();
 			
 		
 /*		_url = o.get("web_url").toString();
@@ -111,11 +121,11 @@ public class Article {
 		_id = (long) vo.get("_id");
 		_wordcount = (int) o.get("wordcount");
 */		
-		} catch (JSONException | IOException e) {
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		tokens = findTokens();
+		//tokens = findTokens();
 	}
 	
 	public String getId()
@@ -146,6 +156,11 @@ public class Article {
 	public String getText()
 	{
 		return !_abstract.equals("") ? _abstract.toLowerCase() : _lead_paragraph.toLowerCase();
+	}
+	
+	public String getStemmed()
+	{
+		return _stemmed;
 	}
 	
 	public String getSource()
@@ -215,12 +230,12 @@ public class Article {
 		return _wordcount;
 	}
 	
-	public HashMap<String, Integer> getTokens() throws IOException {
+/*	public HashMap<String, Integer> getTokens() throws IOException {
         return tokens;
     }
-	
+*/	
 	private HashMap<String, Integer> findTokens() throws IOException {
-        String text = _abstract;
+        String text = getText();
         HashMap<String, Integer> docTf = new HashMap<>();
         sr = new StringReader(text);
         ts = analyzer.tokenStream("irrelevant", sr);
@@ -250,7 +265,7 @@ public class Article {
     /*
     Ενημέρωση του συνολικου DF για ολη τη συλλογή με το προς εξέταση tweet.
     */
-    public void updateDf(HashMap<String, Integer> totaldf) throws IOException {
+/*    public void updateDf(HashMap<String, Integer> totaldf) throws IOException {
 
         Set<String> tokenKeySet = tokens.keySet();
         Iterator<String> tokenIt = tokenKeySet.iterator();
@@ -267,6 +282,49 @@ public class Article {
                 totaldf.put(token, docValue);
             }
         }
+    }
+*/    
+    public String calcStemmed()
+    {
+    	String text = getText();
+    	String s = null;
+    	sr = new StringReader(text);
+        
+    	for (int i = 0; i < _stopList.size(); i++)
+    	{
+    		try
+    		{
+				this.analyzer = new StopAnalyzer(version, new File(_stopList.get(i)));
+				ts = analyzer.tokenStream("irrelevant", sr);
+				
+				//offsetAtt = ts.addAttribute(OffsetAttribute.class);
+		        termAtt = ts.addAttribute(CharTermAttribute.class);
+
+		        ts.reset();
+		        
+		        while (ts.incrementToken())
+		        {
+		            //int startOffset = offsetAtt.startOffset();
+		            //int endOffset = offsetAtt.endOffset();
+
+		            String term = termAtt.toString();
+		            stemmer.setCurrent(term);
+		            stemmer.stem();
+		            term = stemmer.getCurrent();
+		            
+		            s = s + term + " ";
+		        }
+		        ts.close();
+		        
+			}
+    		catch (IOException e)
+    		{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	sr.close();
+    	return s;
     }
 	
 }

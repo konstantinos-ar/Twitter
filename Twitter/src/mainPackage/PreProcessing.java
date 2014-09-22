@@ -114,16 +114,16 @@ public class PreProcessing
                  tweet αποθηκευουμε τα tokens της χρησιμοποιωντας ως κλειδί το ID
                  του tweet (το Twitter εγγυάται οτι είναι μοναδικο).
 				 */
-				postingMap.put(currDoc.getId(), currDoc.getTokens());
+				//postingMap.put(currDoc.getId(), currDoc.getTokens());
 				//Ενημέρωση του πίνακα των συνολικων μοναδικων λέξεων, για τη συλλογή
-				currDoc.updateDf(tokenMap);
+				//currDoc.updateDf(tokenMap);
 				/*
                  Λήψη του sentiment score για το κείμενο του tweet. Μέ βάση αυτο
                  το score βρίσκουμε αν ένα παράδειγμα είναι θετικο ή αρνητικο και
                  το κατατάσσουμε αναλογως στο συνολο παραδειγμάτων εκπαίδευσης του
                  classifier.
 				 */
-				sentiScore = lexicon.extractScore(currDoc.getText());
+				sentiScore = lexicon.extractScore(currDoc.getStemmed());
 				if (sentiScore > 0)
 				{
 					if (posList.size() < 10000)
@@ -191,7 +191,7 @@ public class PreProcessing
 			{
 				temp = itCurr.next();
 				//if (temp.getAbstract() != null)
-					text = temp.getText();
+					text = temp.getStemmed();
 				//else
 				//	text = temp.getSnippet();
 				Classified classified = new Classified(text, classification);

@@ -137,7 +137,7 @@ public class HelperUtil
 				}
 				pubdate = status.getDate();
 				Integer score;
-				String sentiTest = classifier.classify(status.getText()).bestCategory();
+				String sentiTest = classifier.classify(status.getStemmed()).bestCategory();
 				//δημιουργουμε το χάρτη με τα θετικά,αρνητικά και ουδέτερα tweets
 				if ("neu".equals(sentiTest))
 				{
