@@ -7,11 +7,11 @@ WebContent/
 *.dat
 *.zip
 *.txt
-/nbproject
-/classifiers
-/models
-/web
-/WebContent
+/nbproject/*
+/classifiers/*
+/models/*
+/web/*
+/WebContent/*
 classifiers
 models
 web
