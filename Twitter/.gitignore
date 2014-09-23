@@ -1,9 +1,9 @@
 *.class
-nbproject
-classifiers
-models
-web
-WebContent
+nbproject/
+classifiers/
+models/
+web/
+WebContent/
 *.dat
 *.zip
 *.txt
