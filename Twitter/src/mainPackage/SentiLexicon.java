@@ -40,12 +40,12 @@ public class SentiLexicon {
             int lineNumber = 0;
 
             String line;
-/*            while ((line = csvPos.readLine()) != null) {
+            while ((line = csvPos.readLine()) != null) {
                 lineNumber++;
 
                 /*
                  Αν είναι σχολιο, μη το χρησιμοποήσεις.
-                 *
+                 */
                 if (!line.trim().startsWith("#")) {
                     dictionary.put(line.toLowerCase(), 1.0);
 
@@ -76,7 +76,7 @@ public class SentiLexicon {
 
                 }
             }
-*/            
+            
             while ((line = csvNeg3.readLine()) != null) { 
                 lineNumber++; 
   
@@ -188,9 +188,13 @@ public class SentiLexicon {
         if (dictionary.containsKey(word + "#" + pos)){ 
         return dictionary.get(word + "#" + pos);}return 0; 
     } 
-    public double extractScore(String sentence){ 
+    
+    public double extractScore(String sentence){
+    	
     	double sum = 0; 
         double i=0.00000001;
+        if (sentence == null)
+        	return 0;
         String[] words = sentence.split(" ");
            
         for (int j = 0; j < words.length; j++) {

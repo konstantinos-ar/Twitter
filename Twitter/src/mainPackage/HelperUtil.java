@@ -8,6 +8,16 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+import edu.stanford.nlp.util.CoreMap;
+
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
@@ -16,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Properties;
 
 /**
  * Βοηθητική κλάση με λειτουργίες που θεωρήσαμε οτι δεν χρειαζοτανε να
@@ -88,6 +99,7 @@ public class HelperUtil
 		SimpleDateFormat form = new SimpleDateFormat("MMM dd yyyy");
 		String d, d2, s1, s2;
 		Date dd = null, dd2 = null;
+	//	MaxentTagger tagger =  new MaxentTagger("C:/Users/user/git/Twitter/Twitter/models/wsj-0-18-left3words-distsim.tagger");
 		try {
 			dd = formatter2.parse(start.toString());
 			dd2 = formatter2.parse(end.toString());
@@ -137,6 +149,28 @@ public class HelperUtil
 				}
 				pubdate = status.getDate();
 				Integer score;
+				System.out.println("Category Stemmed: " + status.getStemmed());
+		//		String tagged = tagger.tagString(status.getStemmed());
+		//		System.out.println(tagged);
+				/*String s = null;
+				Properties props = new Properties(); 
+				  props.put("annotators", "tokenize, ssplit, pos, lemma"); 
+				  StanfordCoreNLP pipeline = new StanfordCoreNLP(props, false);
+				  String text = status.getStemmed(); 
+				  s = null;
+				  Annotation document = pipeline.process(text);  
+				  for(CoreMap sentence: document.get(SentencesAnnotation.class)) {    
+				    for(CoreLabel token: sentence.get(TokensAnnotation.class)) {       
+				    String word = token.get(TextAnnotation.class);      
+				    String lemma = token.get(LemmaAnnotation.class); 
+				    if ( s == null)
+						s = lemma + " ";
+					else
+						s = s + lemma + " ";
+				    //System.out.println("lemmatized version :" + lemma);
+				    } }
+				  System.out.println("lemmatized version :" + s);*/
+				
 				String sentiTest = classifier.classify(status.getStemmed()).bestCategory();
 				//δημιουργουμε το χάρτη με τα θετικά,αρνητικά και ουδέτερα tweets
 				if ("neu".equals(sentiTest))

@@ -192,10 +192,15 @@ public class PreProcessing
 				temp = itCurr.next();
 				//if (temp.getAbstract() != null)
 					text = temp.getStemmed();
+					System.out.println("Stemmed is: " + text);
 				//else
 				//	text = temp.getSnippet();
 				Classified classified = new Classified(text, classification);
+				try
+				{
 				((ObjectHandler) classi).handle(classified);
+				}
+				catch(Exception e){}
 			}
 		}
 		return classi;

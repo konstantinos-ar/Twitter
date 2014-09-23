@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -26,6 +27,15 @@ import org.json.JSONObject;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import com.mongodb.DBObject;
+
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
 
 public class Article {
 	
@@ -90,12 +100,13 @@ public class Article {
 			_wordcount = Integer.parseInt(vo.optString("word_count"));
 			
 			//this.analyzer = new StopAnalyzer(version, new File("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt"));
-			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt");
-			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Currencies.txt");
+			
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/stop.txt");
+			//_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt");
+			//_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Currencies.txt");
 			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_DatesandNumbers.txt");
 			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Geographic.txt");
-			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Names.txt");
-			_stopList.add("C:/Users/user/git/Twitter/Twitter/stop.txt");
+			//_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Names.txt");
 			
 			_stemmed = calcStemmed();
 			
@@ -153,14 +164,24 @@ public class Article {
 		return _abstract.toLowerCase();
 	}
 	
-	public String getText()
+	private String getText()
 	{
-		return !_abstract.equals("") ? _abstract.toLowerCase() : _lead_paragraph.toLowerCase();
+		//return _abstract.length()>_lead_paragraph.length() ? _abstract.toLowerCase() : _lead_paragraph.toLowerCase();
+		if (_abstract.length()>_lead_paragraph.length())
+			return _abstract.toLowerCase();
+		else if (_abstract.length()<_lead_paragraph.length())
+			return _lead_paragraph.toLowerCase();
+		else if (_snippet.length() > 10)
+			return _snippet.toLowerCase();
+		else
+			return _headline_main.toLowerCase();
 	}
 	
 	public String getStemmed()
 	{
-		return _stemmed;
+		if (_stemmed == null)
+			return null;
+		return _stemmed.trim();
 	}
 	
 	public String getSource()
@@ -292,6 +313,7 @@ public class Article {
         
     	try
     	{
+    		System.out.println("Orig is : " + text);
 
     		for (int i = 0; i < _stopList.size(); i++)
     		{
@@ -302,6 +324,7 @@ public class Article {
     			termAtt = ts.addAttribute(CharTermAttribute.class);
 
     			ts.reset();
+    			s = null;
 
     			while (ts.incrementToken())
     			{
@@ -309,15 +332,35 @@ public class Article {
     				//int endOffset = offsetAtt.endOffset();
 
     				String term = termAtt.toString();
-    				stemmer.setCurrent(term);
-    				stemmer.stem();
-    				term = stemmer.getCurrent();
-
-    				s = s + term + " ";
+    				//stemmer.setCurrent(term);
+    				//stemmer.stem();
+    				//term = stemmer.getCurrent();
+    				
+    				if ( s == null)
+    					s = term + " ";
+    				else
+    					s = s + term + " ";
     			}
 
-    			
+    			sr = new StringReader(s.trim());
     		}
+    		//System.out.println("Stem is : " + s);
+    		Properties props = new Properties(); 
+			  props.put("annotators", "tokenize, ssplit, pos, lemma"); 
+			  StanfordCoreNLP pipeline = new StanfordCoreNLP(props, false);
+			  String text2 = s.trim();
+			  s = null;
+			  Annotation document = pipeline.process(text2);  
+			  for(CoreMap sentence: document.get(SentencesAnnotation.class)) {    
+			    for(CoreLabel token: sentence.get(TokensAnnotation.class)) {       
+			    String word = token.get(TextAnnotation.class);      
+			    String lemma = token.get(LemmaAnnotation.class); 
+			    if ( s == null)
+					s = lemma + " ";
+				else
+					s = s + lemma + " ";
+			   // System.out.println("lemmatized version :" + lemma);
+			    } }
     		ts.close();
 
     	}
@@ -327,7 +370,7 @@ public class Article {
     		e.printStackTrace();
     	}
     	sr.close();
-    	return s;
+    	return s.trim();
     }
 	
 }
