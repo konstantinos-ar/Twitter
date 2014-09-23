@@ -1,7 +1,7 @@
 *.class
 nbproject/
 classifiers/
-models/
+models/*
 web/
 WebContent/
 *.dat
