@@ -6,3 +6,4 @@ C:UsersusergitTwitterTwitterbuildweb
 C:/Users/user/git/Twitter/Twitter/build/web/META-INF
 C:/Users/user/git/Twitter/Twitter/build/web/web-inf
 C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/lingpipe-4.1.0.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/lucene-analyzers-common-4.8.1.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/lucene-core-4.8.1.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/mongo-java-driver-2.12.1.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/twitter4j-async-4.0.1.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/twitter4j-core-4.0.1.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/twitter4j-media-support-4.0.1.jar C:/Users/user/git/Twitter/Twitter/build/web/web-inf/lib/twitter4j-stream-4.0.1.jar
+C:UsersusergitTwitterTwitterbuildwebweb-inflib*.jar
