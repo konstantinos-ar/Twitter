@@ -7,37 +7,29 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.util.Version;
-import org.bson.BSONObject;
-import org.bson.BasicBSONDecoder;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.tartarus.snowball.ext.PorterStemmer;
 
 import com.mongodb.DBObject;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 
-public class Article {
+public class Article
+{
 	
 	private String _url;
 	private String _snippet;
@@ -62,22 +54,23 @@ public class Article {
 	private Analyzer analyzer;
     private StringReader sr;
     private TokenStream ts;
-    private OffsetAttribute offsetAtt;
+    //private OffsetAttribute offsetAtt;
     private CharTermAttribute termAtt;
     //private final HashMap<String, Integer> tokens;
-    private final PorterStemmer stemmer = new PorterStemmer();
-    private int totalTokens = 0;
-    private long id;
+    //private final PorterStemmer stemmer = new PorterStemmer();
+    //private int totalTokens = 0;
+    //private long id;
 	
 	public Article (DBObject o) throws IOException
 	{
 		JSONObject vo = null;
-		JSONObject vo2 = null;
-		JSONArray ar = null;
+		//JSONObject vo2 = null;
+		//JSONArray ar = null;
 		//BSONObject bo = null;
 		//BasicBSONDecoder decoder = new BasicBSONDecoder();
 
-		try {
+		try
+		{
 			//bo.putAll(o);
 			vo = new JSONObject(o.toString());
 		
@@ -132,7 +125,9 @@ public class Article {
 		_id = (long) vo.get("_id");
 		_wordcount = (int) o.get("wordcount");
 */		
-		} catch (JSONException e) {
+		}
+		catch (JSONException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -209,15 +204,18 @@ public class Article {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
 		Date dd = null;
-		try {
-				dd = formatter2.parse(_pubdate.substring(10, 34));
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				String d = formatter.format(dd);
-				//d2 = formatter.format(dd2);
-		
+		try
+		{
+			dd = formatter2.parse(_pubdate.substring(10, 34));
+		}
+		catch (ParseException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String d = formatter.format(dd);
+		//d2 = formatter.format(dd2);
+
 		return d;
 	}
 
@@ -255,7 +253,7 @@ public class Article {
         return tokens;
     }
 */	
-	private HashMap<String, Integer> findTokens() throws IOException {
+/*	private HashMap<String, Integer> findTokens() throws IOException {
         String text = getText();
         HashMap<String, Integer> docTf = new HashMap<>();
         sr = new StringReader(text);
@@ -282,7 +280,7 @@ public class Article {
         sr.close();
         return docTf;
     }
-    
+ */   
     /*
     Ενημέρωση του συνολικου DF για ολη τη συλλογή με το προς εξέταση tweet.
     */
@@ -335,7 +333,7 @@ public class Article {
     				//stemmer.setCurrent(term);
     				//stemmer.stem();
     				//term = stemmer.getCurrent();
-    				
+
     				if ( s == null)
     					s = term + " ";
     				else
@@ -346,21 +344,24 @@ public class Article {
     		}
     		//System.out.println("Stem is : " + s);
     		Properties props = new Properties(); 
-			  props.put("annotators", "tokenize, ssplit, pos, lemma"); 
-			  StanfordCoreNLP pipeline = new StanfordCoreNLP(props, false);
-			  String text2 = s.trim();
-			  s = null;
-			  Annotation document = pipeline.process(text2);  
-			  for(CoreMap sentence: document.get(SentencesAnnotation.class)) {    
-			    for(CoreLabel token: sentence.get(TokensAnnotation.class)) {       
-			    String word = token.get(TextAnnotation.class);      
-			    String lemma = token.get(LemmaAnnotation.class); 
-			    if ( s == null)
-					s = lemma + " ";
-				else
-					s = s + lemma + " ";
-			   // System.out.println("lemmatized version :" + lemma);
-			    } }
+    		props.put("annotators", "tokenize, ssplit, pos, lemma"); 
+    		StanfordCoreNLP pipeline = new StanfordCoreNLP(props, false);
+    		String text2 = s.trim();
+    		s = null;
+    		Annotation document = pipeline.process(text2);  
+    		for(CoreMap sentence: document.get(SentencesAnnotation.class))
+    		{    
+    			for(CoreLabel token: sentence.get(TokensAnnotation.class))
+    			{       
+    				//String word = token.get(TextAnnotation.class);      
+    				String lemma = token.get(LemmaAnnotation.class); 
+    				if ( s == null)
+    					s = lemma + " ";
+    				else
+    					s = s + lemma + " ";
+    				// System.out.println("lemmatized version :" + lemma);
+    			}
+    		}
     		ts.close();
 
     	}

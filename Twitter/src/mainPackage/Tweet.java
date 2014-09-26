@@ -24,7 +24,7 @@ import twitter4j.URLEntity;
 
 /**
  *
- * @author dgi
+ * @author ka
  */
 public class Tweet {
 

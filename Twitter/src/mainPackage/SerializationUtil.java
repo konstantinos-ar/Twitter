@@ -11,7 +11,7 @@ import com.aliasi.classify.DynamicLMClassifier;
 import com.aliasi.classify.LMClassifier;
 
 /*
- Βοηθητική κλάση για de/serialization δεδομένων απο και προς το δίσκο.
+ Βοηθητική κλάση για de/serialization δεδομένων από και προς το δίσκο.
  */
 public class SerializationUtil implements Serializable
 {
@@ -21,6 +21,7 @@ public class SerializationUtil implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("rawtypes")
 	public static Object deserialize(String fileName) throws IOException, ClassNotFoundException
 	{
 		FileInputStream fis = new FileInputStream(fileName);
@@ -42,6 +43,7 @@ public class SerializationUtil implements Serializable
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void serialize(Object obj, String fileName) throws IOException
 	{
 		FileOutputStream fos = new FileOutputStream(fileName);

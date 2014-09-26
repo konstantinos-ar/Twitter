@@ -7,10 +7,6 @@ package mainPackage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
@@ -37,7 +33,7 @@ public class peakFinding {
         return temp / c.length;
     }
 
-    //�?�?�?ια μέθοδος ευρεσης των κορυφων (peaks) με βάση τον αλγοριθμο του OPAD
+    //μέθοδος ευρεσης των κορυφων (peaks) με βάση τον αλγοριθμο του OPAD
     public static ArrayList<String> peakFinder(Integer[] c, double a, int k, int t) {
         double mean = c[0];
         double meandev = getVariance(Arrays.copyOfRange(c, 0, k));

@@ -8,30 +8,15 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
-import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-import edu.stanford.nlp.util.CoreMap;
-
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Properties;
 
 /**
- * Βοηθητική κλάση με λειτουργίες που θεωρήσαμε οτι δεν χρειαζοτανε να
- * δημιουργήσουμε ξεχωριστές κλάσεις για τη κάθε μια, οποτε και τις
- * συγκεντρωσαμε εδω.
+ * Βοηθητική κλάση για την εκτέλεση του αιτήματος
+ * και την εξαγωγή των αποτελεσμάτων.
  */
 public class HelperUtil
 {
@@ -43,11 +28,8 @@ public class HelperUtil
 	}
 
 	/**
-	 * Μέθοδος που μας δίνει cursor με αποτελέσματα απο το χρονικο διάστημα
-	 * start μέχρι end. Το πεδίο _id της βάσης κρατά την πληροφορία του ποτε
-	 * αποθηκευτηκε ένα στοιχείο. Ετσι θεωρησαμε οτι αφου τα αποτελέσματα μας
-	 * είναι realtime είναι σωστο να πάρουμε αυτο. Στη πραγματικοτητα
-	 * παρατηρήσαμε οτι δεν υπάρχει καθολου διαφορα.
+	 * Μέθοδος που επιστρέφει cursor με αποτελέσματα απο το χρονικο διάστημα
+	 * start μέχρι end.
 	 * @throws ParseException 
 	 */
 
@@ -85,25 +67,28 @@ public class HelperUtil
 	}
 
 	/**
-	 * Η μέθοδος μας επιστρέφει ένα array με 3 String τα οποία είναι
+	 * Μέθοδος που επιστρέφει ένα array με δεδομένα τα οποία είναι
 	 * επεξεργασμένα για το συναίσθημα και έτοιμα να αναπαρασταθουν στο google 
-	 * chart api και στο google maps api
+	 * chart api.
 	 *
 	 */
 	public String[] sentiStream(Date start, Date end,
-			LMClassifier classifier) throws UnknownHostException, Exception
+			@SuppressWarnings("rawtypes") LMClassifier classifier) throws UnknownHostException, Exception
 	{
-		HashMap<String, Integer> countries = new HashMap<String, Integer>();
+		//HashMap<String, Integer> countries = new HashMap<String, Integer>();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat formatter2 = new SimpleDateFormat("EEE MMM dd hh:mm:ss z yyyy", Locale.ENGLISH);
 		SimpleDateFormat form = new SimpleDateFormat("MMM dd yyyy");
-		String d, d2, s1, s2;
+		String d, d2;//, s1, s2;
 		Date dd = null, dd2 = null;
 	//	MaxentTagger tagger =  new MaxentTagger("C:/Users/user/git/Twitter/Twitter/models/wsj-0-18-left3words-distsim.tagger");
-		try {
+		try
+		{
 			dd = formatter2.parse(start.toString());
 			dd2 = formatter2.parse(end.toString());
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -115,7 +100,7 @@ public class HelperUtil
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
 		DBObject obj;
-		final DBCollection collection = db.getCollection("news");
+		final DBCollection collection = db.getCollection("aapl");
 		Article status;
 		int sumNeg, sumPos, sumNeu, sumNegAll, sumPosAll, sumNeuAll;
 		String stringTimeline = "[['Date', 'Sentiment'],";
@@ -123,36 +108,37 @@ public class HelperUtil
 		sumNegAll = 0;
 		sumPosAll = 0;
 		sumNeuAll = 0;
-		Date dn, dx;
+		//Date dn, dx;
 		//for (long time = start.getTime(); time <= end.getTime(); time += BuckSize)
 		//{
-			sumNeg = 0;
-			sumPos = 0;
-			sumNeu = 0;
-			String pubdate = d;
-			DBCursor temp = getCursorInRange(collection, d, d2);
-			double fscore = 0;
+		sumNeg = 0;
+		sumPos = 0;
+		sumNeu = 0;
+		String pubdate = d;
+		DBCursor temp = getCursorInRange(collection, d, d2);
+		//double fscore = 0;
 
 
-			while (temp.hasNext())
+		while (temp.hasNext())
+		{
+			obj = temp.next();
+
+			status = new Article(obj);
+			if (!status.getDate().equals(pubdate))
 			{
-				obj = temp.next();
-
-				status = new Article(obj);
-				if (!status.getDate().equals(pubdate))
-				{
-					stringTimeline = stringTimeline + "['" + form.format(formatter.parse(pubdate)) + "',"
-							+ (sumPos - sumNeg) + "],";
-					sumNeg = 0;
-					sumPos = 0;
-					sumNeu = 0;
-				}
-				pubdate = status.getDate();
-				Integer score;
-				System.out.println("Category Stemmed: " + status.getStemmed());
-		//		String tagged = tagger.tagString(status.getStemmed());
-		//		System.out.println(tagged);
-				/*String s = null;
+				//Άμα άλλαξε η ημέρα βγάλε το αποτέλεσμα του sentiment για την προηγούμενη ημέρα.
+				stringTimeline = stringTimeline + "['" + form.format(formatter.parse(pubdate)) + "',"
+						+ (sumPos - sumNeg) + "],";
+				sumNeg = 0;
+				sumPos = 0;
+				sumNeu = 0;
+			}
+			pubdate = status.getDate();
+			//Integer score;
+			System.out.println("Category Stemmed: " + status.getStemmed());
+			//		String tagged = tagger.tagString(status.getStemmed());
+			//		System.out.println(tagged);
+			/*String s = null;
 				Properties props = new Properties(); 
 				  props.put("annotators", "tokenize, ssplit, pos, lemma"); 
 				  StanfordCoreNLP pipeline = new StanfordCoreNLP(props, false);
@@ -170,49 +156,32 @@ public class HelperUtil
 				    //System.out.println("lemmatized version :" + lemma);
 				    } }
 				  System.out.println("lemmatized version :" + s);*/
-				
-				String sentiTest = classifier.classify(status.getStemmed()).bestCategory();
-				//δημιουργουμε το χάρτη με τα θετικά,αρνητικά και ουδέτερα tweets
-				if ("neu".equals(sentiTest))
-				{
-					sumNeu++;
-					//if (status.getGeoLocation() != null) {
-					//    country = country + "['Neutral'," + status.getGeoLocation().getLatitude() + "," + status.getGeoLocation().getLongitude() + ",'yellow'],";
-					//}
-				} 
-				else if ("pos".equals(sentiTest))
-				{
-					//if (status.getGeoLocation() != null) {
-					//    country = country + "['Positive'," + status.getGeoLocation().getLatitude() + "," + status.getGeoLocation().getLongitude() + ",'blue'],";
-					//}
-					sumPos++;
-				}
-				else if ("neg".equals(sentiTest))
-				{
-					//if (status.getGeoLocation() != null) {
-					//    country = country + "['Negative'," + status.getGeoLocation().getLatitude() + "," + status.getGeoLocation().getLongitude() + ",'red'],";
-					//}
-					sumNeg++;
-				}
-				sumNegAll += sumNeg;
-				sumPosAll += sumPos;
-				sumNeuAll += sumNeu;
 
+			String sentiTest = classifier.classify(status.getStemmed()).bestCategory();
+			System.out.println("Classification is : " + sentiTest);
+			if ("neu".equals(sentiTest))
+			{
+				sumNeu++;
+			} 
+			else if ("pos".equals(sentiTest))
+			{
+				sumPos++;
 			}
-			//sumNegAll += sumNeg;
-			//sumPosAll += sumPos;
-			//sumNeuAll += sumNeu;
-			//δημιουργουμε το ιστογραμμα του συναισθήματος των tweets
-			//stringTimeline = stringTimeline + "['" + formatter.format(end) + "',"
-			//		+ sumPos + "," + sumNeg + "," + sumNeu + "],";
+			else if ("neg".equals(sentiTest))
+			{
+				sumNeg++;
+			}
+			sumNegAll += sumNeg;
+			sumPosAll += sumPos;
+			sumNeuAll += sumNeu;
 
-		//}
+		}
+
 		stringTimeline = stringTimeline + "]";
 		result[0] = stringTimeline;
-		String stingMap = "[['Country', 'Sentiment'],";
 
 		result[2] = country + "]";
-		result[1] = "[['Sentiment','number of Articles'],"//δημιουργουμε τη πίτα του συναισθήματος των tweets
+		result[1] = "[['Sentiment','number of Articles'],"//δημιουργία της πίτας του συναισθήματος των articles
 				+ "['Positive'," + sumPosAll + "],"
 				+ "['Negative'," + sumNegAll + "],"
 				+ "['Neutral'," + sumNeuAll + "]]";
@@ -221,7 +190,7 @@ public class HelperUtil
 	}
 
 	/**
-	 * Η μέθοδος μας επιστρέφει ένα array με 2 Strings τα οποία είναι
+	 * Η μέθοδος επιστρέφει ένα array με 2 Strings τα οποία είναι
 	 * επεξεργασμένα για να αναπαρασταθουν στο google chart api για την αναπαράσταση
 	 * περιοχων ενδιαφέροντος
 	 *
@@ -239,7 +208,7 @@ public class HelperUtil
 		ArrayList<Integer> timeLine = new ArrayList<Integer>();
 		final DBCollection collection = db.getCollection("news");
 		boolean t = true;
-		//δημιουργία ιστογράμματος των tweets
+		//δημιουργία ιστογράμματος των articles
 		for (long time = start.getTime(); time <= end.getTime(); time += BuckSize)
 		{
 			buckets.add(new Date(time));
@@ -302,7 +271,7 @@ public class HelperUtil
 			//επεξεργασία για την εμφάνιση στο google-charts
 			peakAreas.set(index, "'Peak" + Integer.toString(l) + "'"); 
 			resultString += "<p><div class=\"alert alert-info\"><h4><span class=\"label label-primary\">Peak" 
-					+ Integer.toString(l) + "</span></h4><span class=\"label label-danger\">Words:</span> " + results[0] + " <p><span class=\"label label-info\">URLs:</span> " + results[1] + "<p><span class=\"label label-success\">Most Retweeted tweets:</span> " + results[2] + "</div>";
+					+ Integer.toString(l) + "</span></h4><span class=\"label label-danger\">Words:</span> " + results[0] + " <p><span class=\"label label-info\">URLs:</span> " + results[1] + "<p><span class=\"label label-success\">Most viewed articles:</span> " + results[2] + "</div>";
 			l++;
 		}
 

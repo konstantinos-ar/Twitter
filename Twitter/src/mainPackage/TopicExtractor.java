@@ -16,18 +16,19 @@ import twitter4j.URLEntity;
 
 /**
  *
- * @author dgi
+ * @author ka
  */
 public class TopicExtractor {
 
     /*
      Mέθοδος ευρεσης των Κ πιο σημαντικων λέξεων για το χρονικο παράθυρο που
-     ορισε ο χρήστης ως πεδίο αναζήτησης. Μαζί με τις λέξεις, βρίσκουμε τα Κ πιο
-     συχνά URL και τα K πιο retweeted tweets.
+     ορισε ο χρήστης ως πεδίο αναζήτησης. Μαζί με τις λέξεις, βρίσκω τα Κ πιο
+     συχνά URL και τα K πιο views articles.
      */
     public static String[] topWordsInRange(DBCursor cursor,
             int topKwors, int topKUrls, int topKTweets, HashMap<Long, HashMap<String, Integer>> postingMap,
-            HashMap<String, Double> idf) throws TwitterException {
+            HashMap<String, Double> idf) throws TwitterException
+    {
 
         HashMap<String, Integer> postings;
         HashMap<String, Integer> urls;

@@ -1,10 +1,5 @@
 package mainPackage;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,12 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mongodb.BasicDBObject;
@@ -32,22 +22,22 @@ public class Nparser
 {
 
 	private static ArrayList<HashMap<String, String>> arraylist;
-	private static ArrayList<String> sym = new ArrayList<String>();
-	private static final String TITLE = "title";
-	private static final String DESC = "description";
-	private static final String THUMB = "thumbnail";
-	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=S&P500&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+	//private static ArrayList<String> sym = new ArrayList<String>();
+	//private static final String TITLE = "title";
+	//private static final String DESC = "description";
+	//private static final String THUMB = "thumbnail";
+	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=apple&fq=(%27aapl%27%20%27apple%20inc%27)&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 
 	public static void main(String[] args)
 	{
-		//stream();
+		stream();
 		//getLast();
-		PreProcessing p = new PreProcessing();
+		//PreProcessing p = new PreProcessing();
 	}
 
 	private static void stream()
 	{
-		while (getLast() != "20140914")
+		//while (getLast() != "20140914")
 		{
 			arraylist = new ArrayList<HashMap<String, String>>();
 			JSONArray json_result = null;
@@ -62,7 +52,7 @@ public class Nparser
 			{
 				m = new MongoClient("localhost");
 				DB db = m.getDB("times");
-				final DBCollection coll = db.getCollection("news");
+				final DBCollection coll = db.getCollection("aapl");
 
 				// Retrieve JSON Objects from the given URL in JSONfunctions.class
 				for (int j = 0; j < 101; j++)
@@ -100,7 +90,7 @@ public class Nparser
 
 				}
 				System.out.println("exceptions: " + exx);
-				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=S&P500&begin_date="+getLast()+"&end_date=20140101&fq=news_desk%3A%28%22Business/Financial%20Desk%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=apple&fq=(%27aapl%27%20%27apple%20inc%27)&begin_date="+getLast()+"&end_date=20140101&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 			}
 			//catch (JSONException | UnknownHostException | InterruptedException e)
 			catch (Exception e) 
@@ -130,14 +120,17 @@ public class Nparser
 		SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 		String d;
 		Date dd = null;
-		try {
+		try
+		{
 			m = new MongoClient("localhost");
-		} catch (UnknownHostException e) {
+		}
+		catch (UnknownHostException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		DB db = m.getDB("times");
-		final DBCollection coll = db.getCollection("news");
+		final DBCollection coll = db.getCollection("aapl");
 		DBCursor cursorDoc = coll.find().sort(new BasicDBObject( "pub_date", -1 )).limit(1);
 		DBObject dbo = null;
 
@@ -146,9 +139,12 @@ public class Nparser
 			dbo = cursorDoc.next();
 			//System.out.println(dbo.get("pub_date"));
 			System.out.println(dbo.get("pub_date").toString().substring(0, 10));
-			try {
+			try
+			{
 				dd = formatter2.parse(dbo.get("pub_date").toString().substring(0, 10));
-			} catch (ParseException e) {
+			}
+			catch (ParseException e)
+			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
