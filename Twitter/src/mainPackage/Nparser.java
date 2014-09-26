@@ -3,9 +3,7 @@ package mainPackage;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,7 +19,7 @@ import com.mongodb.util.JSON;
 public class Nparser
 {
 
-	private static ArrayList<HashMap<String, String>> arraylist;
+	//private static ArrayList<HashMap<String, String>> arraylist;
 	//private static ArrayList<String> sym = new ArrayList<String>();
 	//private static final String TITLE = "title";
 	//private static final String DESC = "description";
@@ -39,7 +37,7 @@ public class Nparser
 	{
 		//while (getLast() != "20140914")
 		{
-			arraylist = new ArrayList<HashMap<String, String>>();
+			//arraylist = new ArrayList<HashMap<String, String>>();
 			JSONArray json_result = null;
 			MongoClient m = null;
 			JSONObject vo = null;
