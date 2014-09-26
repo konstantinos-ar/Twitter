@@ -24,7 +24,7 @@ public class Nparser
 	//private static final String TITLE = "title";
 	//private static final String DESC = "description";
 	//private static final String THUMB = "thumbnail";
-	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=apple&fq=(%27aapl%27%20%27apple%20inc%27)&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=nasdaq&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 
 	public static void main(String[] args)
 	{
@@ -50,7 +50,7 @@ public class Nparser
 			{
 				m = new MongoClient("localhost");
 				DB db = m.getDB("times");
-				final DBCollection coll = db.getCollection("aapl");
+				final DBCollection coll = db.getCollection("nasdaq");
 
 				// Retrieve JSON Objects from the given URL in JSONfunctions.class
 				for (int j = 0; j < 101; j++)
@@ -88,7 +88,7 @@ public class Nparser
 
 				}
 				System.out.println("exceptions: " + exx);
-				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=apple&fq=(%27aapl%27%20%27apple%20inc%27)&begin_date="+getLast()+"&end_date=20140101&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=nasdaq&begin_date="+getLast()+"&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 			}
 			//catch (JSONException | UnknownHostException | InterruptedException e)
 			catch (Exception e) 
@@ -128,7 +128,7 @@ public class Nparser
 			e.printStackTrace();
 		}
 		DB db = m.getDB("times");
-		final DBCollection coll = db.getCollection("aapl");
+		final DBCollection coll = db.getCollection("nasdaq");
 		DBCursor cursorDoc = coll.find().sort(new BasicDBObject( "pub_date", -1 )).limit(1);
 		DBObject dbo = null;
 

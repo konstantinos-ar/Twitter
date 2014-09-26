@@ -20,16 +20,16 @@ public class JSONfunctions
 		InputStream is = null;
 		String result = "";
 		JSONObject jArray = null;
+		DefaultHttpClient httpclient = null;
 
 		// Download JSON data from URL
 		try
 		{
-			DefaultHttpClient httpclient = new DefaultHttpClient();
+			httpclient = new DefaultHttpClient();
 			HttpGet httpget = new HttpGet(url);
 			HttpResponse response = httpclient.execute(httpget);
 			HttpEntity entity = response.getEntity();
 			is = entity.getContent();
-			httpclient.close();
 
 		}
 		catch(Exception e)
@@ -48,6 +48,7 @@ public class JSONfunctions
 				sb.append(line + "\n");
 			}
 			is.close();
+			httpclient.close();
 			result=sb.toString();
 
 		}
