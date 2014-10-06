@@ -8,6 +8,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +24,7 @@ public class HelperUtil
 {
 
 	static final long ONE_MINUTE_IN_MILLIS = 60000;
+	//MaxentTagger tagger = new MaxentTagger("C:/Users/user/git/Twitter/Twitter/models/wsj-0-18-left3words-distsim.tagger");
 
 	public HelperUtil()
 	{
@@ -100,7 +103,7 @@ public class HelperUtil
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
 		DBObject obj;
-		final DBCollection collection = db.getCollection("aapl");
+		final DBCollection collection = db.getCollection("fb");
 		Article status;
 		int sumNeg, sumPos, sumNeu, sumNegAll, sumPosAll, sumNeuAll;
 		String stringTimeline = "[['Date', 'Sentiment'],";
@@ -123,7 +126,7 @@ public class HelperUtil
 		{
 			obj = temp.next();
 
-			status = new Article(obj);
+			status = new Article(obj, null);
 			if (!status.getDate().equals(pubdate))
 			{
 				//Άμα άλλαξε η ημέρα βγάλε το αποτέλεσμα του sentiment για την προηγούμενη ημέρα.

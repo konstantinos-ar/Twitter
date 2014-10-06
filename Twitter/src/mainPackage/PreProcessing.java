@@ -10,6 +10,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
@@ -36,6 +38,7 @@ public class PreProcessing
 	@SuppressWarnings("rawtypes")
 	//Ο Classifier που χρησιμοποιείται για binary classification.
 	LMClassifier classifier;
+	//MaxentTagger tagger = new MaxentTagger("C:/Users/user/git/Twitter/Twitter/models/wsj-0-18-left3words-distsim.tagger");
 
 	public HashMap<String, Double> getIdf()
 	{
@@ -84,24 +87,30 @@ public class PreProcessing
 				"EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
 		dateFormat.setLenient(false);
 		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String[] cols = {"news","nasdaq","aapl","msft"};
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
-		final DBCollection collection1 = db.getCollection("news");
+		DBCollection collection1;
+		DBCursor cursor;
 		HashMap<String, Integer> tokenMap = new HashMap<>();
 		ArrayList<Article> posList = new ArrayList<Article>();
 		ArrayList<Article> negList = new ArrayList<Article>();
 		ArrayList<Article> netList = new ArrayList<Article>();
+		SentiLexicon lexicon = new SentiLexicon();
 		Article currDoc;
-		DBCursor cursor = collection1.find();
+		for ( int i = 0; i < cols.length; i++)
+		{
+		collection1 = db.getCollection(cols[i]);
+		cursor = collection1.find();
 		//int counter = 0;
 		double sentiScore;
-		SentiLexicon lexicon = new SentiLexicon();
+		
 		try
 		{
 			while (cursor.hasNext())
 			{
 				//counter++;
-				currDoc = new Article(cursor.next());
+				currDoc = new Article(cursor.next(), null);
 				/*
                  Aποθήκευση της λίστας των λέξεων του συγκεκριμένου article. Για κάθε
                  articke αποθηκευονται τα tokens του χρησιμοποιωντας ως κλειδί το ID
@@ -116,15 +125,15 @@ public class PreProcessing
                  το κατατάσσουμε αναλογως στο συνολο παραδειγμάτων εκπαίδευσης του
                  classifier.
 				 */
-				sentiScore = lexicon.extractScore(currDoc.getStemmed());
-				if (sentiScore > 0)
+				sentiScore = lexicon.getScore(currDoc.getStemmed());
+				if (sentiScore > 1)
 				{
 					if (posList.size() < 10000)
 					{
 						posList.add(currDoc);
 					}
 				}
-				else if (sentiScore < 0)
+				else if (sentiScore < -1)
 				{
 					if (negList.size() < 10000)
 					{
@@ -143,17 +152,17 @@ public class PreProcessing
 		finally
 		{
 			cursor.close();
-		}
+		}}
 		/*
          Ο τελικος υπολογισμος του IDF αφου πλέον ξέρουμε τις λέξεις της συλλογής
          μετά την επεξεργασία, αποθηκευουμε τα στοιχεία στο δίσκο.
 		 */
 		//idf = normalizeDf(tokenMap, counter);
-		SerializationUtil.serialize(idf, "idf.dat");
+		//SerializationUtil.serialize(idf, "idf.dat");
 		tokenMap.clear();
 		classifier = train(posList, negList, netList);
 		SerializationUtil.serialize(classifier, "classifier.dat");
-		SerializationUtil.serialize(postingMap, "postings.dat");
+		//SerializationUtil.serialize(postingMap, "postings.dat");
 	}
 
 	//Εκπαίδευση του Classifier με το training set

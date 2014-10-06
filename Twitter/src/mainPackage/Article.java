@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -21,11 +22,14 @@ import org.json.JSONObject;
 import com.mongodb.DBObject;
 
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.util.CoreMap;
 
 public class Article
@@ -49,6 +53,7 @@ public class Article
 	private int _wordcount;
 	private String _stemmed;
 	private ArrayList<String> _stopList = new ArrayList<String>();
+	//MaxentTagger tagger;
 	
 	private final Version version = Version.LUCENE_48;
 	private Analyzer analyzer;
@@ -61,7 +66,7 @@ public class Article
     //private int totalTokens = 0;
     //private long id;
 	
-	public Article (DBObject o) throws IOException
+	public Article (DBObject o, MaxentTagger tagger) throws IOException
 	{
 		JSONObject vo = null;
 		//JSONObject vo2 = null;
@@ -96,11 +101,12 @@ public class Article
 			
 			_stopList.add("C:/Users/user/git/Twitter/Twitter/stop.txt");
 			//_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Generic.txt");
-			//_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Currencies.txt");
-			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_DatesandNumbers.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Currencies.txt");
 			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Geographic.txt");
-			//_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Names.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_Names.txt");
+			_stopList.add("C:/Users/user/git/Twitter/Twitter/ND_Stop_Words_DatesandNumbers.txt");
 			
+			//this.tagger = tagger;
 			_stemmed = calcStemmed();
 			
 		
@@ -306,7 +312,7 @@ public class Article
     public String calcStemmed()
     {
     	String text = getText();
-    	String s = null;
+    	String s = null, t = null;
     	sr = new StringReader(text);
         
     	try
@@ -359,9 +365,34 @@ public class Article
     					s = lemma + " ";
     				else
     					s = s + lemma + " ";
-    				// System.out.println("lemmatized version :" + lemma);
+    				 //System.out.println("lemmatized version :" + lemma);
     			}
     		}
+    		/*List<List<HasWord>> sentences = MaxentTagger.tokenizeText(new StringReader(s.trim()));
+    		s = null;
+			for(List<HasWord> sentence: sentences)
+			{ 
+				ArrayList<TaggedWord> tagged = tagger.tagSentence(sentence); 
+				for(TaggedWord word: tagged)
+				{ 
+					if ( word.tag().startsWith("V"))
+						t = "v";
+					else if ( word.tag().startsWith("N"))
+						t = "n";
+					else if ( word.tag().startsWith("R"))
+						t = "r";
+					else if ( word.tag().startsWith("J"))
+						t = "a";
+					else
+						t = "w";
+					if ( s == null)
+    					s = word.value() + "#" + t + " ";
+    				else
+    					s = s + word.value() + "#" + t + " ";
+					System.out.println("Tag: " + t); 
+					System.out.println("Value: " + word.value()); 
+				}
+			}*/
     		ts.close();
 
     	}

@@ -75,11 +75,11 @@ public class SentiLexicon
 
 				if (!line.trim().startsWith("#"))
 				{
-					dictionary.put(line, -1.0);
+					dictionary.put(line.toLowerCase(), -1.0);
 				}
 			}
 
-			while ((line = csvNeg3.readLine()) != null)
+			/*while ((line = csvNeg3.readLine()) != null)
 			{ 
 				lineNumber++; 
 
@@ -156,7 +156,7 @@ public class SentiLexicon
 				score /= sum; 
 
 				dictionary.put(word, score); 
-			}
+			}*/
 
 
 		}
@@ -196,9 +196,9 @@ public class SentiLexicon
 		String[] words = sentence.split(" ");
 		for (int i = 0; i < words.length; i++)
 		{
-			if (dictionary.get(words[i]) != null)
+			if (dictionary.get(words[i].toLowerCase()) != null)
 			{
-				sum += dictionary.get(words[i]);
+				sum += dictionary.get(words[i].toLowerCase());
 			}
 		}
 		return sum;
