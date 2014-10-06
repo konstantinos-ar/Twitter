@@ -24,7 +24,7 @@ public class Nparser
 	//private static final String TITLE = "title";
 	//private static final String DESC = "description";
 	//private static final String THUMB = "thumbnail";
-	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=facebook&begin_date=20100816&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=bank%20of%20america&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 
 	public static void main(String[] args)
 	{
@@ -35,7 +35,8 @@ public class Nparser
 
 	private static void stream()
 	{
-		while (getLast() != "20140914")
+		String exdate = "";
+		while (exdate != "20140914" && exdate != "20140913" && exdate != "20140912")
 		{
 			//arraylist = new ArrayList<HashMap<String, String>>();
 			JSONArray json_result = null;
@@ -50,7 +51,7 @@ public class Nparser
 			{
 				m = new MongoClient("localhost");
 				DB db = m.getDB("times");
-				final DBCollection coll = db.getCollection("fb");
+				final DBCollection coll = db.getCollection("bac");
 
 				// Retrieve JSON Objects from the given URL in JSONfunctions.class
 				for (int j = 0; j < 101; j++)
@@ -71,7 +72,7 @@ public class Nparser
 							}
 							catch (Exception e)
 							{
-								System.out.println(e.toString());
+								//System.out.println(e.toString());
 								++exx;
 							}
 
@@ -88,7 +89,15 @@ public class Nparser
 
 				}
 				System.out.println("exceptions: " + exx);
-				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=facebook&begin_date="+getLast()+"&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+				exdate = getLast();
+				System.out.println("exDate: " + exdate);
+				if (exdate.equals("20140914"))
+					break;
+				if (exdate.equals("20140913"))
+					break;
+				if (exdate.equals("20140912"))
+					break;
+				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=bank%20of%20america&begin_date="+exdate+"&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 			}
 			//catch (JSONException | UnknownHostException | InterruptedException e)
 			catch (Exception e) 
@@ -128,7 +137,7 @@ public class Nparser
 			e.printStackTrace();
 		}
 		DB db = m.getDB("times");
-		final DBCollection coll = db.getCollection("fb");
+		final DBCollection coll = db.getCollection("bac");
 		DBCursor cursorDoc = coll.find().sort(new BasicDBObject( "pub_date", -1 )).limit(1);
 		DBObject dbo = null;
 

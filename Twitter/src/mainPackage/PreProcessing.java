@@ -87,7 +87,7 @@ public class PreProcessing
 				"EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
 		dateFormat.setLenient(false);
 		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-		String[] cols = {"news","nasdaq","aapl","msft"};
+		String[] cols = {"news","nasdaq","aapl","msft","cost","csco","ebay","fb","ford","goog","gs","jpm","ms","qcom","xom","yhoo"};
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
 		DBCollection collection1;
@@ -128,21 +128,21 @@ public class PreProcessing
 				sentiScore = lexicon.getScore(currDoc.getStemmed());
 				if (sentiScore > 1)
 				{
-					if (posList.size() < 10000)
+					if (posList.size() < 100000)
 					{
 						posList.add(currDoc);
 					}
 				}
 				else if (sentiScore < -1)
 				{
-					if (negList.size() < 10000)
+					if (negList.size() < 100000)
 					{
 						negList.add(currDoc);
 					}
 				}
 				else
 				{
-					if (netList.size() < 20000)
+					if (netList.size() < 200000)
 					{
 						netList.add(currDoc);
 					}

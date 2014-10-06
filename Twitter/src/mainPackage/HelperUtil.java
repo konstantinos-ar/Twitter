@@ -103,7 +103,7 @@ public class HelperUtil
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
 		DBObject obj;
-		final DBCollection collection = db.getCollection("fb");
+		final DBCollection collection = db.getCollection("bac");
 		Article status;
 		int sumNeg, sumPos, sumNeu, sumNegAll, sumPosAll, sumNeuAll;
 		String stringTimeline = "[['Date', 'Sentiment'],";
