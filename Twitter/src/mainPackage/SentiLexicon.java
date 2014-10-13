@@ -38,13 +38,13 @@ public class SentiLexicon
 			int lineNumber = 0;
 
 			String line;
-			while ((line = csvPos.readLine()) != null)
+			/*while ((line = csvPos.readLine()) != null)
 			{
 				lineNumber++;
 
 				/*
                  Αν είναι σχόλιο, μην το χρησιμοποιήσεις.
-				 */
+				 *
 				if (!line.trim().startsWith("#"))
 				{
 					dictionary.put(line.toLowerCase(), 1.0);
@@ -58,7 +58,7 @@ public class SentiLexicon
 				{
 					dictionary.put(line.toLowerCase(), -1.0);
 				}
-			}
+			}*/
 
 			while ((line = csvPos2.readLine()) != null)
 			{

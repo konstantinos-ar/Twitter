@@ -24,13 +24,14 @@ public class Nparser
 	//private static final String TITLE = "title";
 	//private static final String DESC = "description";
 	//private static final String THUMB = "thumbnail";
-	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=bank%20of%20america&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+	//static String q = "verizon";
+	private static String urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=S%26P&fq=%28lead_paragraph%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29+OR+abstract%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29+OR+snippet%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29+OR+headline%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29%29+AND+news_desk%3A%28%22Business%22+%22Business%2FFinancial+Desk%22+%22Dealbook%22%29&begin_date=20040101&end_date=20140101&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";//"http://api.nytimes.com/svc/search/v2/articlesearch.json?q="+q+"&begin_date=20040101&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%20%22Dealbook%22%29%20AND%20%28lead_paragraph%3A%28%22"+q+"%22%29%20OR%20abstract%3A%28%22"+q+"%22%29%20OR%20headline%3A%28%22"+q+"%22%29%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 
 	public static void main(String[] args)
 	{
-		stream();
+		//stream();
 		//getLast();
-		//PreProcessing p = new PreProcessing();
+		PreProcessing p = new PreProcessing();
 	}
 
 	private static void stream()
@@ -51,7 +52,7 @@ public class Nparser
 			{
 				m = new MongoClient("localhost");
 				DB db = m.getDB("times");
-				final DBCollection coll = db.getCollection("bac");
+				final DBCollection coll = db.getCollection("news2");
 
 				// Retrieve JSON Objects from the given URL in JSONfunctions.class
 				for (int j = 0; j < 101; j++)
@@ -97,7 +98,7 @@ public class Nparser
 					break;
 				if (exdate.equals("20140912"))
 					break;
-				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=bank%20of%20america&begin_date="+exdate+"&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
+				urlin = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=S%26P&fq=%28lead_paragraph%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29+OR+abstract%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29+OR+snippet%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29+OR+headline%3A%28%22S%26P%22+%22SP500%22+%22S%26P500%22+%22Standard%26Poor%27s%22%29%29+AND+news_desk%3A%28%22Business%22+%22Business%2FFinancial+Desk%22+%22Dealbook%22%29&begin_date="+exdate+"&end_date=20140101&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";//"http://api.nytimes.com/svc/search/v2/articlesearch.json?q="+q+"&begin_date="+exdate+"&end_date=20140914&fq=news_desk%3A%28%22Business/Financial%20Desk%22%20%22Business%22%20%22Dealbook%22%29%20AND%20%28lead_paragraph%3A%28%22"+q+"%22%29%20OR%20abstract%3A%28%22"+q+"%22%29%20OR%20headline%3A%28%22"+q+"%22%29%29&sort=oldest&api-key=932411dde075fd16337547bd13fdb616%3A11%3A69757573";
 			}
 			//catch (JSONException | UnknownHostException | InterruptedException e)
 			catch (Exception e) 
@@ -137,7 +138,7 @@ public class Nparser
 			e.printStackTrace();
 		}
 		DB db = m.getDB("times");
-		final DBCollection coll = db.getCollection("bac");
+		final DBCollection coll = db.getCollection("news2");
 		DBCursor cursorDoc = coll.find().sort(new BasicDBObject( "pub_date", -1 )).limit(1);
 		DBObject dbo = null;
 

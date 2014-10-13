@@ -66,7 +66,7 @@ public class HelperUtil
 		BasicDBObject dateQuery = new BasicDBObject("pub_date", new BasicDBObject("$gte", formatter.parseObject(start)).append("$lte", formatter.parseObject(end)));//"pub_date",
 				//new BasicDBObject("$gte", startId).append("$lt", endId));
 		//dateQuery.put("pub_date", new BasicDBObject("$gt", Integer.parseInt(d)).append("$lt", Integer.parseInt(d2)));
-		return coll.find(dateQuery);
+		return coll.find(dateQuery).sort( new BasicDBObject( "pub_date" , 1 ) );
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class HelperUtil
 		MongoClient mongoClient = new MongoClient("localhost");
 		DB db = mongoClient.getDB("times");
 		DBObject obj;
-		final DBCollection collection = db.getCollection("bac");
+		final DBCollection collection = db.getCollection("news");
 		Article status;
 		int sumNeg, sumPos, sumNeu, sumNegAll, sumPosAll, sumNeuAll;
 		String stringTimeline = "[['Date', 'Sentiment'],";
@@ -127,7 +127,8 @@ public class HelperUtil
 			obj = temp.next();
 
 			status = new Article(obj, null);
-			if (!status.getDate().equals(pubdate))
+			//System.out.println("Pub Date: " + pubdate.substring(0, 4));
+			if (!status.getDate().substring(0, 4).equals(pubdate.substring(0, 4)))
 			{
 				//Άμα άλλαξε η ημέρα βγάλε το αποτέλεσμα του sentiment για την προηγούμενη ημέρα.
 				stringTimeline = stringTimeline + "['" + form.format(formatter.parse(pubdate)) + "',"
@@ -135,6 +136,7 @@ public class HelperUtil
 				sumNeg = 0;
 				sumPos = 0;
 				sumNeu = 0;
+				System.out.println("Pub Date: " + pubdate.substring(0, 4));
 			}
 			pubdate = status.getDate();
 			//Integer score;
